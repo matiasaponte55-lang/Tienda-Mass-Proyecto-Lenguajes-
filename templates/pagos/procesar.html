@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+
+{% block title %}Pagar Pedido - Tiendas Mass{% endblock %}
+
+{% block content %}
+<h2 class="fw-bold mb-4 text-dark"><i class="bi bi-credit-card-2-front-fill text-warning"></i> Métodos de Pago</h2>
+
+<div class="row">
+    <div class="col-lg-7">
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-primary text-white py-3" style="background-color: #0d47a1 !important;">
+                <h5 class="mb-0 fw-bold"><i class="bi bi-wallet2"></i> Seleccione Método de Pago</h5>
+            </div>
+            <div class="card-body p-4">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">1. Tipo de Comprobante:</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="tipo_comprobante" id="boleta" value="boleta" checked>
+                            <label class="form-check-label fw-semibold" for="boleta">Boleta de Venta Electrónica (DNI)</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="tipo_comprobante" id="factura" value="factura">
+                            <label class="form-check-label fw-semibold" for="factura">Factura Electrónica (RUC)</label>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Número de Documento (DNI / RUC):</label>
+                        <input type="text" name="documento_cliente" class="form-control" value="{{ request.user.dni|default:'' }}" placeholder="Ingrese DNI (8 dígitos) o RUC (11 dígitos)" required>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">2. Método de Pago:</label>
+                        
+                        <div class="form-check p-3 border rounded mb-2 bg-light">
+                            <input class="form-check-input" type="radio" name="metodo" id="yape" value="yape" checked>
+                            <label class="form-check-label fw-bold text-primary" for="yape">
+                                <i class="bi bi-qr-code text-purple"></i> Yape (Código QR / Celular)
+                            </label>
+                            <small class="d-block text-muted">Transfiere al número 987-654-321 (Tiendas Mass S.A.C.)</small>
+                        </div>
+
+                        <div class="form-check p-3 border rounded mb-2 bg-light">
+                            <input class="form-check-input" type="radio" name="metodo" id="plin" value="plin">
+                            <label class="form-check-label fw-bold text-info" for="plin">
+                                <i class="bi bi-qr-code-scan"></i> Plin (Interbank / BBVA / Scotiabank)
+                            </label>
+                            <small class="d-block text-muted">Transfiere al número 987-654-321</small>
+                        </div>
+
+                        <div class="form-check p-3 border rounded mb-2 bg-light">
+                            <input class="form-check-input" type="radio" name="metodo" id="tarjeta" value="tarjeta">
+                            <label class="form-check-label fw-bold text-success" for="tarjeta">
+                                <i class="bi bi-credit-card"></i> Tarjeta de Crédito o Débito (Visa / Mastercard)
+                            </label>
+                            <small class="d-block text-muted">Pago protegido en línea</small>
+                        </div>
+
+                        <div class="form-check p-3 border rounded mb-2 bg-light">
+                            <input class="form-check-input" type="radio" name="metodo" id="contraentrega" value="contraentrega">
+                            <label class="form-check-label fw-bold text-dark" for="contraentrega">
+                                <i class="bi bi-cash-coin"></i> Pago Contra Entrega
+                            </label>
+                            <small class="d-block text-muted">Paga en efectivo al recibir tu pedido en casa</small>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Código de Operación / Referencia (Opcional):</label>
+                        <input type="text" name="codigo_operacion" class="form-control" placeholder="Ej. 12345678">
+                    </div>
+
+                    <button type="submit" class="btn btn-warning w-100 fw-bold py-3 fs-5 mt-2">
+                        <i class="bi bi-check-circle-fill"></i> Confirmar y Procesar Pago (S/ {{ pedido.total }})
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resumen Pedido -->
+    <div class="col-lg-5">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-warning text-dark fw-bold py-3">
+                <i class="bi bi-box-seam"></i> Resumen de la Compra #{{ pedido.numero_orden }}
+            </div>
+            <div class="card-body">
+                <p><strong>Destino:</strong> {{ pedido.direccion_entrega }}</p>
+                <p><strong>Teléfono:</strong> {{ pedido.telefono_contacto }}</p>
+                <hr>
+                <ul class="list-group list-group-flush mb-3">
+                    {% for det in pedido.detalles.all %}
+                        <li class="list-group-item d-flex justify-content-between px-0">
+                            <span>{{ det.cantidad }}x {{ det.producto.nombre }}</span>
+                            <span class="fw-bold">S/ {{ det.subtotal }}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+                <div class="d-flex justify-content-between mb-1">
+                    <span class="text-muted">Subtotal:</span>
+                    <span class="fw-bold">S/ {{ pedido.subtotal }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">IGV (18%):</span>
+                    <span class="fw-bold">S/ {{ pedido.igv }}</span>
+                </div>
+                <hr>
+                <div class="d-flex justify-content-between">
+                    <span class="fs-5 fw-bold">Total a Pagar:</span>
+                    <span class="fs-4 fw-bold text-primary">S/ {{ pedido.total }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

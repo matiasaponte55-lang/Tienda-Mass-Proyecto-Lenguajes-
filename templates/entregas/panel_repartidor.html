@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Panel de Entregas - Repartidor Tiendas Mass{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold text-dark mb-0"><i class="bi bi-bicycle text-warning"></i> Mis Entregas Asignadas</h2>
+        <small class="text-muted">Actualiza en tiempo real el estado de tus entregas en Lima</small>
+    </div>
+    <span class="badge bg-primary fs-6">Repartidor: {{ request.user.get_full_name|default:request.user.username }}</span>
+</div>
+
+<div class="row">
+    {% for ent in entregas %}
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center py-3">
+                    <span class="fw-bold">Orden #{{ ent.pedido.numero_orden }}</span>
+                    <span class="badge {% if ent.estado == 'entregado' %}bg-success{% elif ent.estado == 'en_camino' %}bg-warning text-dark{% else %}bg-secondary{% endif %}">
+                        {{ ent.get_estado_display }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <p class="mb-1"><strong>Cliente:</strong> {{ ent.pedido.cliente.get_full_name|default:ent.pedido.cliente.username }}</p>
+                    <p class="mb-1"><strong>Teléfono:</strong> <a href="tel:{{ ent.pedido.telefono_contacto }}" class="fw-bold">{{ ent.pedido.telefono_contacto }}</a></p>
+                    <p class="mb-1"><strong>Dirección:</strong> {{ ent.pedido.direccion_entrega }}</p>
+                    <p class="mb-2"><strong>Zona:</strong> {{ ent.get_zona_display }}</p>
+                    <hr>
+                    <small class="text-muted d-block mb-3">Total a entregar: <strong class="text-primary">S/ {{ ent.pedido.total }}</strong></small>
+
+                    <!-- Formulario de Actualización de Estado -->
+                    <form method="post" action="{% url 'entregas:actualizar_estado' ent.id %}" class="d-flex gap-2">
+                        {% csrf_token %}
+                        <select name="estado" class="form-select form-select-sm">
+                            <option value="preparando" {% if ent.estado == 'preparando' %}selected{% endif %}>En Preparación</option>
+                            <option value="en_camino" {% if ent.estado == 'en_camino' %}selected{% endif %}>En Camino</option>
+                            <option value="entregado" {% if ent.estado == 'entregado' %}selected{% endif %}>Entregado con Éxito</option>
+                            <option value="fallido" {% if ent.estado == 'fallido' %}selected{% endif %}>Intento Fallido</option>
+                        </select>
+                        <button type="submit" class="btn btn-warning btn-sm fw-bold">Actualizar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <div class="col-12 text-center py-5">
+            <i class="bi bi-check-circle fs-1 text-success"></i>
+            <h4 class="mt-3 text-muted">No tienes entregas pendientes por el momento</h4>
+            <p>Las órdenes asignadas a tu cuenta aparecerán automáticamente aquí.</p>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

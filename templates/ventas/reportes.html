@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block title %}Reportes de Ventas - Tiendas Mass{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold text-dark mb-0"><i class="bi bi-graph-up text-warning"></i> Reportes y Análisis Comercial</h2>
+        <small class="text-muted">Indicadores clave de ingresos, rotación de productos y pedidos</small>
+    </div>
+    <button onclick="window.print()" class="btn btn-outline-dark">
+        <i class="bi bi-printer"></i> Imprimir Reporte
+    </button>
+</div>
+
+<!-- KPIs -->
+<div class="row g-3 mb-4">
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0 bg-primary text-white p-4" style="background-color: #0d47a1 !important;">
+            <small class="text-warning fw-bold">INGRESOS TOTALES FACTURADOS</small>
+            <h2 class="fw-bold mb-0 mt-2">S/ {{ total_ingresos|floatformat:2 }}</h2>
+            <small class="text-white-50">Incluye IGV 18% recaudado</small>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0 bg-success text-white p-4">
+            <small class="text-white-50 fw-bold">PEDIDOS PROCESADOS CON ÉXITO</small>
+            <h2 class="fw-bold mb-0 mt-2">{{ total_pedidos }} órdenes</h2>
+            <small class="text-white-50">Ventas en tienda online Tiendas Mass</small>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Top Productos -->
+    <div class="col-md-5 mb-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white py-3 fw-bold">
+                <i class="bi bi-star-fill text-warning"></i> Top 5 Productos Más Vendidos
+            </div>
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+                    {% for item in top_productos %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center py-3">
+                            <div>
+                                <h6 class="mb-0 fw-bold">{{ item.producto__nombre }}</h6>
+                                <small class="text-muted">Recaudado: S/ {{ item.total_recaudado }}</small>
+                            </div>
+                            <span class="badge bg-primary rounded-pill fs-6">{{ item.total_vendidos }} unid.</span>
+                        </li>
+                    {% empty %}
+                        <li class="list-group-item text-center py-4 text-muted">Aún no hay ventas registradas.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Últimos Pedidos -->
+    <div class="col-md-7 mb-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white py-3 fw-bold">
+                <i class="bi bi-receipt"></i> Últimas Transacciones Registradas
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>N° Orden</th>
+                            <th>Cliente</th>
+                            <th>Total</th>
+                            <th>Estado</th>
+                            <th>Fecha</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in ultimos_pedidos %}
+                            <tr>
+                                <td class="fw-bold"><a href="{% url 'ventas:detalle_pedido' p.id %}">#{{ p.numero_orden }}</a></td>
+                                <td>{{ p.cliente.username }}</td>
+                                <td class="fw-bold text-primary">S/ {{ p.total }}</td>
+                                <td>
+                                    <span class="badge {% if p.estado == 'pagado' or p.estado == 'entregado' %}bg-success{% else %}bg-warning text-dark{% endif %}">
+                                        {{ p.get_estado_display }}
+                                    </span>
+                                </td>
+                                <td><small class="text-muted">{{ p.fecha|date:"d/m/Y H:i" }}</small></td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-4 text-muted">Sin transacciones recientes.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

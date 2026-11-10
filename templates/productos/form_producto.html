@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ titulo }} - Tiendas Mass{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-primary text-white py-3" style="background-color: #0d47a1 !important;">
+                <h4 class="mb-0 fw-bold"><i class="bi bi-box-seam"></i> {{ titulo }}</h4>
+            </div>
+            <div class="card-body p-4">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-8 mb-3">
+                            <label class="form-label fw-bold">Nombre del Producto:</label>
+                            {{ form.nombre }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-bold">Código Único:</label>
+                            {{ form.codigo }}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Descripción:</label>
+                        {{ form.descripcion }}
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Categoría:</label>
+                            {{ form.categoria }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Precio Unitario (S/):</label>
+                            {{ form.precio }}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-bold">Stock Inicial:</label>
+                            {{ form.stock }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-bold">Stock Mínimo (Alerta):</label>
+                            {{ form.stock_minimo }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-bold">Fecha Vencimiento:</label>
+                            {{ form.fecha_vencimiento }}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Imagen del Producto:</label>
+                        {{ form.imagen }}
+                    </div>
+
+                    <div class="form-check mb-4">
+                        {{ form.activo }}
+                        <label class="form-check-label fw-bold" for="{{ form.activo.id_for_label }}">
+                            Producto visible y activo en catálogo
+                        </label>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'productos:inventario' %}" class="btn btn-outline-secondary">Cancelar</a>
+                        <button type="submit" class="btn btn-warning fw-bold px-4">
+                            <i class="bi bi-save"></i> Guardar Producto
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

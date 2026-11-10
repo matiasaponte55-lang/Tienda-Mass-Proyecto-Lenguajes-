@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}Finalizar Compra - Tiendas Mass{% endblock %}
+
+{% block content %}
+<h2 class="fw-bold mb-4 text-dark"><i class="bi bi-bag-check-fill text-warning"></i> Finalizar Compra</h2>
+
+<div class="row">
+    <div class="col-lg-7">
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-primary text-white py-3" style="background-color: #0d47a1 !important;">
+                <h5 class="mb-0 fw-bold"><i class="bi bi-geo-alt-fill"></i> Datos de Entrega</h5>
+            </div>
+            <div class="card-body p-4">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Nombre del Cliente:</label>
+                        <input type="text" class="form-control" value="{{ request.user.get_full_name|default:request.user.username }}" readonly>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Dirección de Entrega (Lima):</label>
+                        <input type="text" name="direccion" class="form-control" value="{{ request.user.direccion|default:'' }}" placeholder="Ej. Av. Arequipa 1234, Miraflores" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Teléfono de Contacto:</label>
+                        <input type="text" name="telefono" class="form-control" value="{{ request.user.telefono|default:'' }}" placeholder="Ej. 987654321" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-warning w-100 fw-bold py-3 fs-5 mt-3">
+                        <i class="bi bi-lock-fill"></i> Confirmar Pedido y Continuar al Pago
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resumen -->
+    <div class="col-lg-5">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-warning text-dark fw-bold py-3">
+                <i class="bi bi-list-check"></i> Detalle de la Orden
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush mb-3">
+                    {% for item in carrito %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <div>
+                                <span class="fw-bold">{{ item.nombre }}</span>
+                                <small class="text-muted d-block">Cant: {{ item.cantidad }} x S/ {{ item.precio }}</small>
+                            </div>
+                            <span class="fw-bold text-primary">S/ {{ item.subtotal }}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">Subtotal:</span>
+                    <span class="fw-bold">S/ {{ subtotal }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">IGV (18%):</span>
+                    <span class="fw-bold">S/ {{ igv }}</span>
+                </div>
+                <hr>
+                <div class="d-flex justify-content-between">
+                    <span class="fs-5 fw-bold">Total Final:</span>
+                    <span class="fs-4 fw-bold text-primary">S/ {{ total }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

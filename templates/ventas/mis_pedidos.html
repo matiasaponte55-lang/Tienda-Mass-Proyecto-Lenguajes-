@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block title %}Mis Pedidos - Tiendas Mass{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold text-dark mb-0"><i class="bi bi-clock-history text-warning"></i> Mis Pedidos y Compras</h2>
+    <a href="{% url 'productos:catalogo' %}" class="btn btn-outline-primary">
+        <i class="bi bi-cart"></i> Seguir Comprando
+    </a>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>N° Orden</th>
+                    <th>Fecha</th>
+                    <th>Dirección</th>
+                    <th>Total</th>
+                    <th>Estado de Pago</th>
+                    <th>Comprobante</th>
+                    <th>Seguimiento</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in pedidos %}
+                    <tr>
+                        <td class="fw-bold"><a href="{% url 'ventas:detalle_pedido' p.id %}">#{{ p.numero_orden }}</a></td>
+                        <td>{{ p.fecha|date:"d/m/Y H:i" }}</td>
+                        <td>{{ p.direccion_entrega|truncatechars:30 }}</td>
+                        <td class="fw-bold text-primary">S/ {{ p.total }}</td>
+                        <td>
+                            {% if p.estado == 'pagado' or p.estado == 'en_camino' or p.estado == 'entregado' %}
+                                <span class="badge bg-success">Pagado</span>
+                            {% elif p.estado == 'pendiente' %}
+                                <span class="badge bg-warning text-dark">Pendiente de Pago</span>
+                            {% else %}
+                                <span class="badge bg-danger">{{ p.get_estado_display }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if p.comprobante %}
+                                <a href="{% url 'pagos:ver_comprobante' p.comprobante.id %}" class="btn btn-sm btn-outline-secondary">
+                                    <i class="bi bi-receipt"></i> {{ p.comprobante.serie_numero }}
+                                </a>
+                            {% else %}
+                                <a href="{% url 'pagos:procesar' p.id %}" class="btn btn-sm btn-warning fw-bold">
+                                    Pagar Ahora
+                                </a>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if p.estado != 'pendiente' %}
+                                <a href="{% url 'entregas:seguimiento' p.id %}" class="btn btn-sm btn-primary" style="background-color: #0d47a1;">
+                                    <i class="bi bi-truck"></i> Ver Tracking
+                                </a>
+                            {% else %}
+                                <span class="text-muted small">No iniciado</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-5 text-muted">
+                            <i class="bi bi-bag-x fs-1 d-block mb-2"></i>
+                            Aún no has realizado ninguna compra en Tiendas Mass.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

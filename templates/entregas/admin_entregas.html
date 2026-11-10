@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block title %}Despacho y Coordinación de Entregas - Tiendas Mass{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold text-dark mb-0"><i class="bi bi-geo-alt-fill text-warning"></i> Centro de Despacho y Logística</h2>
+        <small class="text-muted">Asignación de repartidores por zonas geográficas de Lima y monitoreo de rutas</small>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>N° Orden</th>
+                    <th>Cliente</th>
+                    <th>Destino</th>
+                    <th>Zona Asignada</th>
+                    <th>Repartidor</th>
+                    <th>Estado</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ent in entregas %}
+                    <tr>
+                        <td class="fw-bold"><a href="{% url 'ventas:detalle_pedido' ent.pedido.id %}">#{{ ent.pedido.numero_orden }}</a></td>
+                        <td>{{ ent.pedido.cliente.username }}</td>
+                        <td><small>{{ ent.pedido.direccion_entrega|truncatechars:25 }}</small></td>
+                        
+                        <!-- Formulario de reasignación -->
+                        <form method="post" action="{% url 'entregas:admin_entregas' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="entrega_id" value="{{ ent.id }}">
+                            <td>
+                                <select name="zona" class="form-select form-select-sm" style="min-width: 140px;">
+                                    <option value="lima_centro" {% if ent.zona == 'lima_centro' %}selected{% endif %}>Lima Centro</option>
+                                    <option value="lima_norte" {% if ent.zona == 'lima_norte' %}selected{% endif %}>Lima Norte</option>
+                                    <option value="lima_sur" {% if ent.zona == 'lima_sur' %}selected{% endif %}>Lima Sur</option>
+                                    <option value="lima_este" {% if ent.zona == 'lima_este' %}selected{% endif %}>Lima Este</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select name="repartidor_id" class="form-select form-select-sm" style="min-width: 140px;">
+                                    <option value="">-- Sin asignar --</option>
+                                    {% for r in repartidores %}
+                                        <option value="{{ r.id }}" {% if ent.repartidor and ent.repartidor.id == r.id %}selected{% endif %}>
+                                            {{ r.get_full_name|default:r.username }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                            <td>
+                                <span class="badge {% if ent.estado == 'entregado' %}bg-success{% elif ent.estado == 'en_camino' %}bg-warning text-dark{% else %}bg-secondary{% endif %}">
+                                    {{ ent.get_estado_display }}
+                                </span>
+                            </td>
+                            <td>
+                                <button type="submit" class="btn btn-sm btn-primary" style="background-color: #0d47a1;">
+                                    Guardar
+                                </button>
+                                <a href="{% url 'entregas:seguimiento' ent.pedido.id %}" class="btn btn-sm btn-outline-secondary" title="Ver tracking">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                            </td>
+                        </form>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-5 text-muted">No hay órdenes para despacho actualmente.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

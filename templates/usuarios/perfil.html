@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}Mi Perfil - Tiendas Mass{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-primary text-white py-3" style="background-color: #0d47a1 !important;">
+                <h4 class="mb-0 fw-bold"><i class="bi bi-person-bounding-box"></i> Mi Perfil de Usuario</h4>
+                <small class="text-warning">Rol actual: {{ user.get_rol_display }}</small>
+            </div>
+            <div class="card-body p-4">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Nombres:</label>
+                            <input type="text" name="first_name" class="form-control" value="{{ user.first_name }}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Apellidos:</label>
+                            <input type="text" name="last_name" class="form-control" value="{{ user.last_name }}">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">DNI (Documento Nacional de Identidad):</label>
+                            <input type="text" class="form-control bg-light" value="{{ user.dni|default:'No registrado' }}" readonly>
+                            <small class="text-muted">El DNI no puede ser modificado una vez registrado.</small>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Correo Electrónico:</label>
+                            <input type="email" name="email" class="form-control" value="{{ user.email }}">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Teléfono / Celular de Contacto:</label>
+                        <input type="text" name="telefono" class="form-control" value="{{ user.telefono }}" placeholder="Ej. 987654321">
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Dirección Habitual de Entrega (Lima):</label>
+                        <input type="text" name="direccion" class="form-control" value="{{ user.direccion }}" placeholder="Ej. Jr. Las Begonias 450, San Isidro">
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'ventas:mis_pedidos' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-bag"></i> Ver Mis Compras
+                        </a>
+                        <button type="submit" class="btn btn-warning fw-bold px-4">
+                            <i class="bi bi-save"></i> Guardar Cambios
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

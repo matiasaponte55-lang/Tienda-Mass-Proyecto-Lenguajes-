@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+{% block title %}Panel de Administración - Tiendas Mass{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold text-dark mb-0"><i class="bi bi-shield-lock-fill text-warning"></i> Panel Central de Administración</h2>
+        <small class="text-muted">Bienvenido, {{ request.user.get_full_name|default:request.user.username }} (Rol: Administrador General)</small>
+    </div>
+    <div>
+        <a href="{% url 'productos:catalogo' %}" class="btn btn-outline-primary me-2">
+            <i class="bi bi-eye"></i> Ver Tienda Cliente
+        </a>
+        <a href="{% url 'admin:index' %}" class="btn btn-dark">
+            <i class="bi bi-gear-fill"></i> Django Admin
+        </a>
+    </div>
+</div>
+
+<!-- Tarjetas KPI Resumen Ejecutivo -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 bg-primary text-white p-3" style="background-color: #0d47a1 !important;">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <small class="text-warning fw-bold">CATÁLOGO</small>
+                    <h3 class="fw-bold mb-0 mt-1">{{ total_productos }}</h3>
+                    <small class="text-white-50">Productos registrados</small>
+                </div>
+                <i class="bi bi-shop fs-1 text-white-50"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 bg-danger text-white p-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <small class="text-white-50 fw-bold">STOCK CRÍTICO</small>
+                    <h3 class="fw-bold mb-0 mt-1">{{ productos_bajo_stock }}</h3>
+                    <small class="text-white-50">Requieren reposición</small>
+                </div>
+                <i class="bi bi-exclamation-triangle-fill fs-1 text-white-50"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 bg-success text-white p-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <small class="text-white-50 fw-bold">VENTAS TOTALES</small>
+                    <h3 class="fw-bold mb-0 mt-1">{{ total_ventas }}</h3>
+                    <small class="text-white-50">Órdenes confirmadas</small>
+                </div>
+                <i class="bi bi-cash-stack fs-1 text-white-50"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 bg-warning text-dark p-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <small class="text-secondary fw-bold">DESPACHO / ENVÍOS</small>
+                    <h3 class="fw-bold mb-0 mt-1">{{ entregas_pendientes }}</h3>
+                    <small class="text-secondary">En preparación o ruta</small>
+                </div>
+                <i class="bi bi-truck fs-1 text-dark-50"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Módulos de Gestión Rápida -->
+<h4 class="fw-bold text-dark mb-3"><i class="bi bi-grid-fill text-warning"></i> Módulos de Operación</h4>
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 h-100 card-product">
+            <div class="card-body p-4 text-center">
+                <i class="bi bi-boxes fs-1 text-primary mb-3 d-block"></i>
+                <h5 class="fw-bold">Control de Inventario y Stock</h5>
+                <p class="text-muted small">Supervisa existencias, alertas de stock mínimo y fechas de vencimiento.</p>
+                <div class="d-flex gap-2 justify-content-center mt-3">
+                    <a href="{% url 'productos:inventario' %}" class="btn btn-primary btn-sm px-3" style="background-color: #0d47a1;">
+                        Ver Inventario
+                    </a>
+                    <a href="{% url 'productos:crear' %}" class="btn btn-warning btn-sm px-3 fw-bold">
+                        + Nuevo Producto
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 h-100 card-product">
+            <div class="card-body p-4 text-center">
+                <i class="bi bi-graph-up-arrow fs-1 text-success mb-3 d-block"></i>
+                <h5 class="fw-bold">Reportes y Analítica Comercial</h5>
+                <p class="text-muted small">Consulta ingresos totales, los productos más vendidos y el balance con IGV (18%).</p>
+                <a href="{% url 'ventas:reportes' %}" class="btn btn-success btn-sm px-4 mt-3">
+                    Ver Reportes de Ventas
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 h-100 card-product">
+            <div class="card-body p-4 text-center">
+                <i class="bi bi-geo-alt-fill fs-1 text-warning mb-3 d-block"></i>
+                <h5 class="fw-bold">Centro de Despacho y Logística</h5>
+                <p class="text-muted small">Asigna repartidores por zonas de Lima (Centro, Norte, Sur, Este) y monitorea entregas.</p>
+                <a href="{% url 'entregas:admin_entregas' %}" class="btn btn-warning btn-sm px-4 fw-bold mt-3">
+                    Administrar Envíos
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

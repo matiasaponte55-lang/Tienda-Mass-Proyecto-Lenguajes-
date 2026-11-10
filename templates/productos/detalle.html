@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ producto.nombre }} - Tiendas Mass{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'productos:catalogo' %}">Catálogo</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'productos:catalogo' %}?categoria={{ producto.categoria.id }}">{{ producto.categoria.nombre }}</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{ producto.nombre }}</li>
+    </ol>
+</nav>
+
+<div class="card shadow-sm border-0 p-4">
+    <div class="row align-items-center">
+        <div class="col-md-5 text-center bg-light p-5 rounded">
+            {% if producto.imagen %}
+                <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" class="img-fluid" style="max-height: 280px;">
+            {% else %}
+                <i class="bi bi-box-seam display-1 text-primary"></i>
+                <p class="text-muted mt-2">Imagen referencial de producto</p>
+            {% endif %}
+        </div>
+        <div class="col-md-7 ps-md-4 mt-3 mt-md-0">
+            <span class="badge bg-primary mb-2">{{ producto.categoria.nombre }}</span>
+            <h2 class="fw-bold text-dark">{{ producto.nombre }}</h2>
+            <p class="text-muted">Código de Producto: <strong>{{ producto.codigo }}</strong></p>
+
+            <h3 class="fw-bold text-primary mb-3">S/ {{ producto.precio }}</h3>
+
+            <p class="text-secondary">{{ producto.descripcion|default:"Producto de primera necesidad comercializado en la cadena de minimarkets Tiendas Mass. Calidad y ahorro garantizados para las familias peruanas." }}</p>
+
+            <div class="row mb-4">
+                <div class="col-sm-6">
+                    <div class="p-3 border rounded bg-light">
+                        <small class="text-muted d-block">Disponibilidad en Almacén:</small>
+                        <strong class="{% if producto.es_stock_bajo %}text-danger{% else %}text-success{% endif %}">
+                            {{ producto.stock }} unidades disponibles
+                        </strong>
+                    </div>
+                </div>
+                <div class="col-sm-6 mt-2 mt-sm-0">
+                    <div class="p-3 border rounded bg-light">
+                        <small class="text-muted d-block">Fecha de Vencimiento:</small>
+                        <strong>
+                            {% if producto.fecha_vencimiento %}
+                                {{ producto.fecha_vencimiento|date:"d/m/Y" }} 
+                                <span class="badge {% if producto.estado_vencimiento == 'Vencido' %}bg-danger{% elif producto.estado_vencimiento == 'Próximo a vencer' %}bg-warning text-dark{% else %}bg-success{% endif %}">
+                                    {{ producto.estado_vencimiento }}
+                                </span>
+                            {% else %}
+                                No aplica
+                            {% endif %}
+                        </strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2">
+                {% if producto.stock > 0 %}
+                    <a href="{% url 'ventas:agregar_carrito' producto.id %}" class="btn btn-warning btn-lg fw-bold px-4">
+                        <i class="bi bi-cart-plus-fill"></i> Agregar al Carrito
+                    </a>
+                {% else %}
+                    <button class="btn btn-secondary btn-lg" disabled>Agotado Temporalmente</button>
+                {% endif %}
+                <a href="{% url 'productos:catalogo' %}" class="btn btn-outline-secondary btn-lg">
+                    Volver al Catálogo
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
